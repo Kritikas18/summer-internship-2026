@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notify - Share & Find Study Notes</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="blur-container">
+        <div class="blur-orb orb-1" id="orb1"></div>
+        <div class="blur-orb orb-2" id="orb2"></div>
+        <div class="blur-orb orb-3" id="orb3"></div>
+    </div>
+
+    <div id="auth-screen">
+        <div class="glass-wrapper-card">
+            <div class="left-panel">
+                <h1>Notify</h1>
+                <div class="tagline">Student Notes Sharing Network</div>
+                <div class="description">Welcome to a decentralized ecosystem built specifically for students and researchers to share, discover, and collaborate on academic material. Seamlessly upload comprehensive lecture notes, exam guides, complex proof mechanisms, and engineering blueprints to empower your university cluster while creating micro-royalty earning structures on premium resources.</div>
+                <div class="features-list">
+                    <div class="feature-item">Easy Search Guide</div>
+                    <div class="feature-item">Quick AI Summary</div>
+                    <div class="feature-item">Version History</div>
+                    <div class="feature-item">Earn from Notes</div>
+                </div>
+            </div>
+            <div class="right-panel">
+                <div class="auth-toggle">
+                    <button class="toggle-btn active" id="registerToggle" onclick="toggleAuth('register')">Create Account</button>
+                    <button class="toggle-btn" id="loginToggle" onclick="toggleAuth('login')">Sign In</button>
+                </div>
+                <div id="registerSection">
+                    <h2 style="margin-bottom: 20px;">Create Student Profile</h2>
+                    <form onsubmit="handleAuth(event)">
+                        <div class="form-group">
+                            <input type="text" id="uName" class="input-field" placeholder="Your Full Name" required>
+                            <input type="email" id="uEmail" class="input-field" placeholder="College Email Address" required>
+                            <input type="text" id="uUni" class="input-field" placeholder="Your University Name (e.g., SRMU, MIT)" required>
+                        </div>
+                        <button type="submit" class="action-btn">Create Profile and Enter</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="main-dashboard">
+        <div class="dashboard-layout">
+            
+            <div class="sidebar">
+                <div>
+                    <h2 style="font-weight: 800; color: var(--text-pure);">Notify</h2>
+                    <ul class="nav-links">
+                        <li><a href="#" class="active" onclick="switchFilter('all')">View Shared Notes</a></li>
+                        <li><a href="#" onclick="switchFilter('premium')">Paid Premium Notes</a></li>
+                        <li><a href="#" onclick="openModal('uploadModal')">Upload New Notes</a></li>
+                        <li><a href="#" onclick="openModal('analyticsModal')">My Earnings and Views</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <div id="userBadgeTier" style="font-size: 0.8rem; font-weight: 800; color: var(--accent-orange); margin-bottom: 10px;">Account Status: Free Plan</div>
+                    <button class="user-trigger-btn" style="width: 100%; padding: 10px; border-radius: 8px; border:1px solid var(--glass-border); cursor:pointer; font-weight:700;" onclick="openModal('profileModal')">Your Profile</button>
+                </div>
+            </div>
+
+            <div class="content-area">
+                <div class="main-stream">
+                    
+                    <div class="carousel-container">
+                        <div class="carousel-track" id="carouselTrack">
+                            <div class="carousel-slide slide-1" style="background: linear-gradient(135deg, rgba(15, 23, 42, 0.85), rgba(30, 41, 59, 0.75)), url('https://images.unsplash.com/photo-1521587760476-6c12a4b040da?q=80&w=1200&auto=format&fit=crop'); background-size: cover; background-position: center;">
+                                <div class="carousel-content">
+                                    <span class="carousel-tag">Trending Notes</span>
+                                    <h3>Featured Study Guide</h3>
+                                    <p>Explore the newly indexed architectural documentation on core neural consensus maps, compiled by elite academic nodes across top universities.</p>
+                                    <a href="#" class="carousel-link-btn">Read Now</a>
+                                </div>
+                            </div>
+                            <div class="carousel-slide slide-2" style="background: linear-gradient(135deg, rgba(30, 27, 75, 0.85), rgba(49, 46, 129, 0.75)), url('https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=1200&auto=format&fit=crop'); background-size: cover; background-position: center;">
+                                <div class="carousel-content">
+                                    <span class="carousel-tag">Premium Access</span>
+                                    <h3>Get Unlimited Access</h3>
+                                    <p>Get unlimited bandwidth package downloads, seamless note syncing, and unlock native AI custom prompts indexing for rapid examination preparation.</p>
+                                    <a href="#" class="carousel-link-btn">Upgrade Account</a>
+                                </div>
+                            </div>
+                            <div class="carousel-slide slide-3" style="background: linear-gradient(135deg, rgba(4, 47, 46, 0.85), rgba(17, 94, 89, 0.75)), url('https://images.unsplash.com/photo-1635070041078-e363dbe005cb?q=80&w=1200&auto=format&fit=crop'); background-size: cover; background-position: center;">
+                                <div class="carousel-content">
+                                    <span class="carousel-tag">Study Circles</span>
+                                    <h3>Join Discussion Group</h3>
+                                    <p>Collaborate in real-time with peer verification protocols across top institutions to structure structured study material and hand-crafted resources.</p>
+                                    <a href="#" class="carousel-link-btn">Join Group</a>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="carousel-nav prev" onclick="moveCarousel(-1)">&#10094;</button>
+                        <button class="carousel-nav next" onclick="moveCarousel(1)">&#10095;</button>
+
+                        <div class="carousel-indicators" id="carouselIndicators">
+                            <div class="ind-bar active"></div>
+                            <div class="ind-bar"></div>
+                            <div class="ind-bar"></div>
+                        </div>
+                    </div>
+
+                    <div class="top-bar">
+                        <div class="search-container">
+                            <input type="text" id="globalSearch" onkeyup="executeFullTextKeywordSearch()" placeholder="Search topics, keywords, or subjects here...">
+                        </div>
+                        <div style="font-weight: 800; color: var(--accent-cyan);" id="nodeVectorTitle">Location: Global Library</div>
+                    </div>
+
+                    <div class="analytics-strip">
+                        <div class="metric-card">
+                            <h4>Total Available Files</h4>
+                            <div class="value" id="totalObjectsCount">2 Units</div>
+                        </div>
+                        <div class="metric-card">
+                            <h4>My Money Earned</h4>
+                            <div class="value" style="color: var(--accent-green);" id="walletBalance">₹0.00</div>
+                        </div>
+                    </div>
+
+                    <div class="category-hub">
+                        <div class="cat-tab active" onclick="filterByBranch('all', this)">All Subjects</div>
+                        <div class="cat-tab" onclick="filterByBranch('B.Tech CSE', this)">Computer Science</div>
+                        <div class="cat-tab" onclick="filterByBranch('Mathematics', this)">Mathematics</div>
+                        <div class="cat-tab" onclick="filterByBranch('Electronics', this)">Electronics</div>
+                    </div>
+
+                    <h2 style="margin-bottom: 20px; font-weight: 800;">Recommended Files For You</h2>
+                    <div class="notes-grid" id="notesVaultGrid"></div>
+                </div>
+
+                <div class="side-stream">
+                    <div class="side-widget">
+                        <h3>Recent Updates</h3>
+                        <div class="live-log-container" id="liveLogsStream">
+                            <div class="log-item">User from <b>MIT</b> logged in to find notes.</div>
+                            <div class="log-item">New premium notes added in <b>Mathematics</b> subject.</div>
+                        </div>
+                    </div>
+
+                    <div class="side-widget">
+                        <h3>Top Active Colleges</h3>
+                        <div class="leaderboard-list">
+                            <div class="leader-item"><span>1. SRMU Campus Alpha</span><b style="color:var(--accent-green)">94k views</b></div>
+                            <div class="leader-item"><span>2. IIT Kanpur Group</span><b style="color:var(--accent-green)">81k views</b></div>
+                            <div class="leader-item"><span>3. Delhi Tech University</span><b style="color:var(--accent-cyan)">55k views</b></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="uploadModal">
+        <div class="modal-box">
+            <button class="close-modal" onclick="closeModal('uploadModal')">✕</button>
+            <h2 style="margin-bottom: 20px;">Upload Study Material</h2>
+            <form onsubmit="dispatchAssetToVault(event)">
+                <div style="border: 2px dashed var(--glass-border); padding: 30px; border-radius: 12px; text-align: center; margin-bottom: 20px; background: rgba(0,0,0,0.01)">
+                    <input type="file" id="assetFile" required style="margin-bottom: 10px;">
+                    <p style="font-size: 0.8rem; color: var(--text-dim);">Formats allowed: PDFs, Text Documents, Word Files</p>
+                </div>
+                <div class="form-group">
+                    <input type="text" id="assetTitle" class="input-field" placeholder="Topic Title (e.g., Operating Systems Unit 1)" required>
+                    <input type="text" id="assetTag" class="input-field" placeholder="Subject Name (e.g., Mathematics, B.Tech CSE)" required>
+                    <textarea id="assetContent" class="input-field" style="height: 80px; resize: none;" placeholder="Type or paste a preview/summary text here..." required></textarea>
+                    
+                    <div style="display:flex; align-items:center; gap: 10px; margin-top: 5px; flex-wrap: wrap;">
+                        <label style="font-size:0.85rem; font-weight:700; color:var(--text-high-contrast);">Pricing Type:</label>
+                        <select id="assetPricingType" class="input-field" style="padding:6px; width:auto;" onchange="togglePricingInput(this.value)">
+                            <option value="free">Free Note (For Everyone)</option>
+                            <option value="paid">Paid Note (Set Price)</option>
+                        </select>
+                        <input type="number" id="assetPriceInput" class="input-field" style="width:100px; padding:6px; display:none;" placeholder="Price (₹)">
+                    </div>
+
+                    <div id="creatorUpiPaymentSection" style="display: none; background: rgba(217, 119, 6, 0.05); padding: 15px; border-radius: 10px; border: 1px dashed var(--accent-orange); gap: 10px; flex-direction: column; margin-top: 10px; width: 100%;">
+                        <label style="font-size:0.8rem; font-weight:700; color:var(--accent-orange);">Set Up Creator UPI Payout Route:</label>
+                        <input type="text" id="assetUpiId" class="input-field" placeholder="Enter your UPI ID (e.g., name@oksbi)">
+                        
+                        <div style="margin-top: 5px; text-align: left;">
+                            <span style="font-size: 0.78rem; font-weight: 600; color: var(--text-high-contrast); display: block; margin-bottom: 4px;">Upload your UPI QR Code Image (.png/.jpg):</span>
+                            <input type="file" id="assetQrFile" accept="image/*" class="input-field" style="padding: 6px;">
+                        </div>
+                    </div>
+                </div>
+                <button type="submit" class="action-btn">Publish Material</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="workspaceModal">
+        <div class="modal-box" style="max-width: 1050px;">
+            <button class="close-modal" onclick="closeModal('workspaceModal')">✕</button>
+            <h2 id="wsTitle" style="color: var(--text-pure);">Reading Pane Workspace</h2>
+            <div class="workspace-grid">
+                <div class="pdf-mock-view">
+                    <div style="background: rgba(99, 44, 216, 0.05); padding: 10px; border-radius: 6px; font-size: 0.8rem; font-weight: 700; color: var(--accent-glow); margin-bottom: 15px; border: 1px solid rgba(99, 44, 216, 0.1);">
+                        Document Viewer Mode Active
+                    </div>
+                    <div id="documentBodyText" style="font-size: 0.95rem; line-height: 1.6; color: var(--text-high-contrast); white-space: pre-wrap;">
+                        Loading your file...
+                    </div>
+                </div>
+                <div class="workspace-sidebar">
+                    <div style="background: rgba(99, 44, 216, 0.04); border: 1px solid rgba(99, 44, 216, 0.15); padding: 15px; border-radius: 12px;">
+                        <h4 style="font-size:0.85rem;">Instant AI Notes Summary</h4>
+                        <p id="aiSummaryBoxText" style="font-size:0.8rem; margin-top:8px; line-height:1.4; color: var(--text-dim);"></p>
+                    </div>
+                    <div style="background: #ffffff; border: 1px solid var(--glass-border); padding: 15px; border-radius: 12px;">
+                        <h4 style="font-size:0.85rem; margin-bottom:8px;">File Edit Logs</h4>
+                        <ul class="version-log-list" id="versionTrackingLog">
+                            <li><span>Original File Uploaded</span><b style="color:var(--accent-green)">Live</b></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="upiGatewayModal">
+        <div class="modal-box" style="max-width: 450px; text-align: center;">
+            <div style="color: var(--accent-glow); font-size: 1.8rem; font-weight:800; margin-bottom: 10px;">✨ Scan QR to Unlock</div>
+            <p style="font-size: 0.85rem; color: var(--text-dim); margin-bottom: 15px;">Scan the creator's personalized UPI QR Code below to purchase this document.</p>
+            
+            <div class="qr-display-container">
+                <div class="qr-frame">
+                    <img id="targetPaymentQrCode" src="" alt="Creator UPI QR Code">
+                </div>
+                <div style="font-weight: 800; font-size: 1.3rem; color: var(--accent-green);" id="qrAmountTag">Amount: ₹0.00</div>
+                <div style="font-size: 0.82rem; color: var(--text-dim); margin-top: 4px;" id="qrUpiRouteTag">UPI VPA: creator@upi</div>
+            </div>
+
+            <div style="background: #f8fafc; padding: 12px; border-radius: 10px; border: 1px solid var(--glass-border); text-align: left; font-size: 0.8rem; margin-bottom: 20px;">
+                💡 <strong>Direct Creator Payout Route:</strong> 100% of this payment directly hits the author's linked bank account instantly via secure UPI protocol.
+            </div>
+            
+            <div style="display:flex; gap:10px;">
+                
+                <button class="action-btn" style="background: var(--text-dim);" onclick="closeModal('upiGatewayModal')">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="analyticsModal">
+        <div class="modal-box">
+            <button class="close-modal" onclick="closeModal('analyticsModal')">✕</button>
+            <h2 style="margin-bottom: 15px;">Creator Stats Board</h2>
+            <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:15px; margin-bottom:25px;">
+                <div style="background:#f8fafc; padding:15px; border-radius:10px; text-align:center; border:1px solid var(--glass-border);">
+                    <div style="font-size:0.8rem; color:var(--text-dim); font-weight:700;">TOTAL VISITS</div>
+                    <div style="font-size:1.5rem; font-weight:800; color:var(--text-pure);" id="creatorAnalyticsViews">142</div>
+                </div>
+                <div style="background:#f8fafc; padding:15px; border-radius:10px; text-align:center; border:1px solid var(--glass-border);">
+                    <div style="font-size:0.8rem; color:var(--text-dim); font-weight:700;">SAVED COPIES</div>
+                    <div style="font-size:1.5rem; font-weight:800; color:var(--text-pure);" id="creatorAnalyticsDownloads">48</div>
+                </div>
+                <div style="background:#f8fafc; padding:15px; border-radius:10px; text-align:center; border:1px solid var(--glass-border);">
+                    <div style="font-size:0.8rem; color:var(--text-dim); font-weight:700;">NET EARNINGS</div>
+                    <div style="font-size:1.5rem; font-weight:800; color:var(--accent-green);" id="creatorAnalyticsEarnings">₹0.00</div>
+                </div>
+            </div>
+            <h4>User Retention Metric Chart</h4>
+            <div style="margin-top:10px; background:var(--text-pure); height:120px; border-radius:10px; display:flex; align-items:flex-end; padding:15px; gap:15px;">
+                <div style="background:var(--accent-glow); width:100%; height:30%; border-radius:3px 3px 0 0;"></div>
+                <div style="background:var(--accent-glow); width:100%; height:55%; border-radius:3px 3px 0 0;"></div>
+                <div style="background:var(--accent-glow); width:100%; height:45%; border-radius:3px 3px 0 0;"></div>
+                <div style="background:var(--accent-glow); width:100%; height:85%; border-radius:3px 3px 0 0;"></div>
+                <div style="background:var(--accent-cyan); width:100%; height:95%; border-radius:3px 3px 0 0;"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="profileModal">
+        <div class="modal-box">
+            <button class="close-modal" onclick="closeModal('profileModal')">✕</button>
+            <h2 style="margin-bottom: 15px;">Your Account Profile Details</h2>
+            <div style="background: #ffffff; padding: 20px; border-radius: 12px; font-family: monospace; font-size: 0.9rem; line-height: 1.8; border: 1px solid var(--glass-border);">
+                <div><strong>Full Name:</strong> <span id="mUser" style="color: var(--text-pure);">Guest Node</span></div>
+                <div><strong>Email Address:</strong> <span id="mEmail" style="color: var(--text-pure);">None</span></div>
+                <div><strong>Your College:</strong> <span id="mUni" style="color: var(--accent-cyan);">Global Base</span></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
