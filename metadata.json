@@ -1,0 +1,6 @@
+{
+  "name": "Notify",
+  "description": "A collaborative notes-sharing platform where students and professionals can upload, co-author, co-annotate, search, and discover academic and professional notes, enhanced with AI summary capabilities.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

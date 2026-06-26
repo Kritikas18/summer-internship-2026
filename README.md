@@ -1,25 +1,20 @@
-Notify - Student Notes Sharing Network
-Notify is a modern web-based platform designed for students and researchers to share, discover, and collaborate on academic materials. Built with a focus on usability and aesthetics, it features a glassmorphism design and a decentralized approach to resource sharing.
+<div align="center">
+<img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
+</div>
 
-Features
-Study Material Repository: Easily upload and browse lecture notes, guides, and blueprints.
+# Run and deploy your AI Studio app
 
-Premium Content: Supports paid notes with integrated UPI payment verification.
+This contains everything you need to run your app locally.
 
-Modern UI: Built with a sleek glassmorphism aesthetic for a professional look.
+View your app in AI Studio: https://ai.studio/apps/918e29ec-ebaa-431c-b852-7099a1fcbfdb
 
-Interactive Dashboard: Real-time updates, analytics, and easy navigation.
+## Run Locally
 
-Technologies Used
-Frontend: HTML5, CSS3, and JavaScript (Vanilla).
+**Prerequisites:**  Node.js
 
-Design: CSS Backdrop Filter for glassmorphism effects.
 
-Media: Dynamic Unsplash imagery and QR-based payment integration.
-
-Setup Instructions
-Clone or Download: Save the project files to your local machine.
-
-Open in Browser: Simply open index.html in any modern web browser to view the application.
-
-Explore: No backend server is required as it uses simulated data for demonstration purposes.
+1. Install dependencies:
+   `npm install`
+2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
+3. Run the app:
+   `npm run dev`
