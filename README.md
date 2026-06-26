@@ -1,20 +1,32 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
-</div>
+notify/
+│
+├── node_modules/
+│
+├── src/
+│   ├── components/
+│   │   ├── Login.tsx
+│   │   ├── PDFViewerModal.tsx
+│   │   ├── StudyCarousel.tsx
+│   │   └── UploadModal.tsx
+│   │
+│   ├── App.tsx
+│   ├── index.css
+│   ├── main.tsx
+│   └── types.ts
+│
+├── .env.example
+├── .gitignore
+├── index.html
+├── metadata.json
+├── package.json
+├── package-lock.json
+├── README.md
+├── server.ts
+├── tsconfig.json
+└── vite.config.ts
 
-# Run and deploy your AI Studio app
-
-This contains everything you need to run your app locally.
-
-View your app in AI Studio: https://ai.studio/apps/918e29ec-ebaa-431c-b852-7099a1fcbfdb
-
-## Run Locally
-
-**Prerequisites:**  Node.js
-
-
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+after extracting files and arranging it.
+open terminal of current folder.
+"npm install"
+"npm run dev". 
+run these commands . project will be visible.
