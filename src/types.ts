@@ -1,3 +1,10 @@
+export interface Note {
+  _id: string;
+  id?: string;
+
+  title: string;
+  ...
+}S
 export interface User {
   id: string;
   name: string;

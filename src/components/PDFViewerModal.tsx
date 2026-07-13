@@ -171,7 +171,7 @@ export default function PDFViewerModal({ note, isOpen, onClose, darkMode = false
 
           <div className="absolute top-44 right-12 border-4 border-dashed border-red-600/30 text-red-600/30 uppercase font-sans font-black text-[10px] tracking-widest px-3 py-1.5 rounded-lg rotate-12 select-none pointer-events-none flex flex-col items-center">
             <span>Notify Certified</span>
-            <span className="text-[7px]">ID: {note.id.toUpperCase()}</span>
+            <span className="text-[7px]">ID: {note._id}</span>
           </div>
 
           <div className="text-sm md:text-base text-slate-800 leading-relaxed space-y-6 select-all font-serif">

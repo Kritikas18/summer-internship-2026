@@ -15,26 +15,46 @@ export default function Login({ onLoginSuccess }: LoginProps) {
   const [institution, setInstitution] = useState('SRMU');
   const [error, setError] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email || !password || (isRegister && !name)) {
-      setError('Please fill in all required fields.');
+  const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+
+  setError("");
+
+  if (!email || !password || (isRegister && !name)) {
+    setError("Please fill in all required fields.");
+    return;
+  }
+
+  try {
+    const url = isRegister ? "/api/register" : "/api/login";
+
+    const res = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        name,
+        email,
+        password,
+        role,
+        institution,
+        avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${name}`,
+      }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      setError(data.error);
       return;
     }
 
-    const loggedUser: User = {
-      id: isRegister ? `user-${Date.now()}` : 'user-student',
-      name: isRegister ? name : 'Kritika Singh',
-      email: email,
-      role: isRegister ? role : 'student',
-      isPremium: false,
-      institution: isRegister ? institution : 'SRMU',
-      studyHistory: ['Computer Science', 'Machine Learning', 'Constitutional Law'],
-      avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${isRegister ? name : 'Kritika'}`
-    };
-
-    onLoginSuccess(loggedUser);
-  };
+    onLoginSuccess(data);
+  } catch {
+    setError("Server Error");
+  }
+};
 
   return (
     <div className="min-h-screen relative flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 overflow-hidden" id="login-container-root">

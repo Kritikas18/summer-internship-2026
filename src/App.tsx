@@ -156,34 +156,24 @@ export default function App() {
       console.error('Failed to fetch notes:', err);
     }
   };
+    const handleSelectNote = (note: Note) => {
 
-  const handleSelectNote = async (note: Note) => {
-    try {
-      const res = await fetch(`/api/notes/${note.id}`);
-      if (res.ok) {
-        const fullNote = await res.json();
-        setSelectedNote(fullNote);
-        setCoAuthorContent(fullNote.content);
-        setIsPdfOpen(true);
-        setAiSummary('');
-        setPlagiarismReport(null);
-        setCurrentPage(1);
-        setZoomLevel(100);
-      }
-    } catch (err) {
-      console.error('Failed to load note detail:', err);
-    }
-  };
+
+      console.log(note);
+  setSelectedNote(note);
+  setCoAuthorContent(note.content);
+  setIsPdfOpen(true);
+};
 
   const handleDownload = async (note: Note) => {
     try {
-      const res = await fetch(`/api/notes/${note.id}/download`, { method: 'POST' });
+      const res = await fetch(`/api/notes/${note._id}/download`, { method: 'POST' });
       if (res.ok) {
         const result = await res.json();
-        if (selectedNote && selectedNote.id === note.id) {
+        if (selectedNote && selectedNote._id === note._id) {
           setSelectedNote(prev => prev ? { ...prev, downloads: result.downloads } : null);
         }
-        setNotes(prev => prev.map(n => n.id === note.id ? { ...n, downloads: result.downloads } : n));
+        setNotes(prev => prev.map(n => n._id === note_id ? { ...n, downloads: result.downloads } : n));
         
         const element = document.createElement("a");
         const file = new Blob([note.content], {type: 'text/plain'});
@@ -238,6 +228,18 @@ export default function App() {
     }
   };
 
+   const deleteNote = async (id: string) => {
+
+  console.log("Frontend ID:", id);
+
+  const res = await fetch(`/api/notes/${id}`, {
+    method: "DELETE",
+  });
+
+  console.log(res.status);
+
+  setNotes(prev => prev.filter(note => note._id !== id));
+};
   const handlePostReview = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedNote || !user) return;
@@ -571,8 +573,8 @@ export default function App() {
                 </button>
 
                 <button
-                  onClick={() => toggleBookmark(selectedNote.id)}
-                  className={`p-2 rounded-lg border transition cursor-pointer ${bookmarkedIds.includes(selectedNote.id) ? 'bg-[#F3F0FF] border-[#9D8DF1] text-[#9D8DF1]' : 'bg-white border-[#E6E1FF] text-slate-400 hover:text-[#2D2A3E]'}`}
+                  onClick={() => toggleBookmark(selectedNote._id)}
+                  className={`p-2 rounded-lg border transition cursor-pointer ${bookmarkedIds.includes(selectedNote._id) ? 'bg-[#F3F0FF] border-[#9D8DF1] text-[#9D8DF1]' : 'bg-white border-[#E6E1FF] text-slate-400 hover:text-[#2D2A3E]'}`}
                   title="Bookmark"
                 >
                   <BookMarked className="h-4 w-4" />
@@ -755,7 +757,7 @@ export default function App() {
 
                     <div className="absolute top-36 right-8 border-4 border-dashed border-red-600/30 text-red-600/30 uppercase font-sans font-black text-[9px] tracking-widest px-2 py-1 rounded-md rotate-12 select-none pointer-events-none flex flex-col items-center">
                       <span>Notify Certified</span>
-                      <span className="text-[6px]">ID: {selectedNote.id.toUpperCase()}</span>
+                      <span className="text-[6px]">ID: {selectedNote._id}</span>
                     </div>
 
                     <div className="text-xs md:text-sm text-slate-800 leading-relaxed space-y-4 select-all font-serif">
@@ -1025,7 +1027,7 @@ export default function App() {
                   ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 pb-4">
                       {filteredNotes.map((note) => {
-                        const isStarred = bookmarkedIds.includes(note.id);
+                        const isStarred = bookmarkedIds.includes(note._id);
                         return (
                           <div
                             key={note.id}
@@ -1042,6 +1044,16 @@ export default function App() {
                                   )}
                                 </div>
 
+                                <button
+                            onClick={(e) => {
+    e.stopPropagation();
+    deleteNote(note._id);
+  }}
+  className="text-red-500 text-xs hover:text-red-700"
+>
+  Delete
+</button>
+
                                 <div className="flex items-center gap-1.5">
                                   {note.isPremium ? (
                                     <span className="text-[9px] bg-amber-50/95 text-amber-700 border border-amber-200/50 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800/50 font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">Premium</span>
@@ -1052,7 +1064,7 @@ export default function App() {
                                   <button
                                     onClick={(e) => {
                                       e.stopPropagation();
-                                      toggleBookmark(note.id);
+                                      toggleBookmark(note._id);
                                     }}
                                     className={`p-1.5 rounded-lg border transition cursor-pointer ${isStarred ? 'bg-[#F3F0FF] dark:bg-[#24223D] border-[#9D8DF1] text-[#9D8DF1]' : 'border-slate-100 dark:border-slate-800 text-slate-300 hover:text-[#9D8DF1]'}`}
                                   >

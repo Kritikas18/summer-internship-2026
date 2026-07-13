@@ -1,3 +1,5 @@
+import * as pdfjsLib from "pdfjs-dist";
+import pdfjsWorker from "pdfjs-dist/build/pdf.worker.min.mjs?url";
 import React, { useState, useRef } from 'react';
 import { X, Upload, FileText, CheckCircle2, IndianRupee, QrCode, AlertCircle } from 'lucide-react';
 import { Note } from '../types';
@@ -43,25 +45,57 @@ export default function UploadModal({ onClose, onUploadSuccess, creatorId, creat
     'History'
   ];
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setSelectedFileName(file.name);
-      setSelectedFileSize(`${(file.size / 1024).toFixed(1)} KB`);
-      setFileType(file.name.endsWith('.pdf') ? 'pdf' : 'text');
-      
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const text = event.target?.result as string;
-        setNoteContent(text || `Uploaded study resource for ${title || 'academic course'}.\n\nContains detailed lecture and review notes.`);
-      };
-      if (file.name.endsWith('.txt')) {
-        reader.readAsText(file);
-      } else {
-        setNoteContent(`[PDF DOCUMENT ATTACHED: ${file.name}]\n\nStudy guide and review notes on ${subject}.\n\nSection 1: Fundamental Concepts & Frameworks.\nSection 2: Practical Exercises & Examples.\nSection 3: Formula summary & Cheat sheets.`);
-      }
+  const handleFileChange = async (
+  e: React.ChangeEvent<HTMLInputElement>
+) => {
+  const file = e.target.files?.[0];
+
+  if (!file) return;
+
+  setSelectedFileName(file.name);
+  setSelectedFileSize(`${(file.size / 1024).toFixed(1)} KB`);
+
+  if (file.name.endsWith(".txt")) {
+    setFileType("text");
+
+    const reader = new FileReader();
+
+    reader.onload = (event) => {
+      setNoteContent(event.target?.result as string);
+    };
+
+    reader.readAsText(file);
+  }
+
+  else if (file.name.endsWith(".pdf")) {
+
+    setFileType("pdf");
+
+    const arrayBuffer = await file.arrayBuffer();
+
+    const pdf = await pdfjsLib.getDocument({
+      data: arrayBuffer,
+    }).promise;
+
+    let extractedText = "";
+
+    for (let i = 1; i <= pdf.numPages; i++) {
+
+      const page = await pdf.getPage(i);
+
+      const textContent = await page.getTextContent();
+
+      extractedText += textContent.items
+        .map((item: any) => item.str)
+        .join(" ");
+
+      extractedText += "\n\n";
     }
-  };
+
+    setNoteContent(extractedText);
+  }
+};
+  
 
   const handleQrChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -219,48 +253,7 @@ export default function UploadModal({ onClose, onUploadSuccess, creatorId, creat
               </div>
             </div>
 
-            <div className="border border-dashed border-slate-200 bg-slate-50/50 rounded-xl p-4 text-center">
-              <input
-                type="file"
-                ref={fileInputRef}
-                onChange={handleFileChange}
-                accept=".txt,.pdf"
-                className="hidden"
-                id="file-upload-input"
-              />
-              {selectedFileName ? (
-                <div className="flex items-center justify-between bg-white p-3 border border-slate-100 rounded-lg max-w-md mx-auto">
-                  <div className="flex items-center space-x-2">
-                    <FileText className="h-5 w-5 text-violet-500" />
-                    <div className="text-left">
-                      <p className="text-xs font-bold text-slate-800 truncate max-w-[200px]">{selectedFileName}</p>
-                      <p className="text-[10px] text-slate-400">{selectedFileSize} • {fileType.toUpperCase()}</p>
-                    </div>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setSelectedFileName('');
-                      setSelectedFileSize('');
-                      setNoteContent('');
-                    }}
-                    className="text-xs text-red-500 hover:underline cursor-pointer"
-                  >
-                    Remove
-                  </button>
-                </div>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => fileInputRef.current?.click()}
-                  className="w-full h-full flex flex-col items-center justify-center py-4 cursor-pointer"
-                >
-                  <Upload className="h-8 w-8 text-violet-400 mb-2" />
-                  <p className="text-xs font-medium text-slate-700">Drag & drop or Click to choose note file</p>
-                  <p className="text-[10px] text-slate-400 mt-1">Supports PDF or formatted TXT (Max 10MB)</p>
-                </button>
-              )}
-            </div>
+            
 
             <div>
               <div className="flex justify-between items-center mb-1">
