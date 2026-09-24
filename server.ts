@@ -9,34 +9,34 @@ import Note from "./models/Note";
 
 dotenv.config();
 
+const mongoUri = process.env.MONGODB_URI || process.env.MONGO_URI;
+
+if (!mongoUri) {
+  throw new Error(
+    "Missing MongoDB connection string. Set MONGODB_URI in your .env file (for example: mongodb+srv://<user>:<password>@cluster.mongodb.net/<dbname>)"
+  );
+}
+
 mongoose
-  .connect(process.env.MONGO_URI!)
-  .then(() => console.log("✅ MongoDB Connected"))
-  .catch((err) => console.log(err));
+  .connect(mongoUri)
+  .then(() => console.log("✅ Connected to MongoDB Atlas"))
+  .catch((err: Error) => {
+    console.error("❌ MongoDB connection failed:", err.message);
+    process.exit(1);
+  });
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = Number(process.env.PORT) || 3000;
 
 app.use(express.json({ limit: "50mb" }));
-
-
-
 
 //seedDatabase();
 
 function searchNotesInDatabase(query: string): any[] {
-  if (!query) return notes;
+  if (!query) return [];
+
   const lowerQuery = query.toLowerCase();
-  return notes.filter((note) => {
-    return (
-      note.title.toLowerCase().includes(lowerQuery) ||
-      note.description.toLowerCase().includes(lowerQuery) ||
-      note.content.toLowerCase().includes(lowerQuery) ||
-      note.subject.toLowerCase().includes(lowerQuery) ||
-      note.institution.toLowerCase().includes(lowerQuery) ||
-      note.tags.some((tag: string) => tag.toLowerCase().includes(lowerQuery))
-    );
-  });
+  return [];
 }
 app.get("/api/notes", async (req, res) => {
   try {
@@ -81,7 +81,7 @@ app.get("/api/notes", async (req, res) => {
 
 app.get("/api/notes/:id", async (req, res) => {
   try {
-    const note = await Note.findOne({ id: req.params.id });
+    const note = await Note.findOne({ $or: [{ _id: req.params.id }, { id: req.params.id }] });
 
     if (!note) {
       return res.status(404).json({ error: "Note not found" });
@@ -96,7 +96,6 @@ app.get("/api/notes/:id", async (req, res) => {
     res.status(500).json(err);
   }
 });
-
 
 app.post("/api/notes", async (req, res) => {
   try {
@@ -125,8 +124,10 @@ app.post("/api/notes", async (req, res) => {
       });
     }
 
+    const noteId = `note-${Date.now()}`;
+
     const newNote = new Note({
-      id: `note-${Date.now()}`,
+      id: noteId,
       title,
       description: description || `Study guide on ${subject}`,
       content,
@@ -177,6 +178,7 @@ app.post("/api/notes", async (req, res) => {
 
       annotations: [],
       comments: [],
+      activeCollaborators: [],
     });
 
     await newNote.save();
@@ -188,19 +190,24 @@ app.post("/api/notes", async (req, res) => {
 });
 app.post("/api/register", async (req, res) => {
   try {
-    const user = new User(req.body);
-    await user.save();
+    const { name, email, password, role, institution, avatar, studyHistory } = req.body;
 
-    res.json(user);
-  } catch (err) {
-    res.status(400).json({
-      error: "User already exists",
+    if (!name || !email || !password) {
+      return res.status(400).json({ error: "Name, email, and password are required." });
+    }
+
+    const user = new User({
+      id: `user-${Date.now()}`,
+      name,
+      email,
+      password,
+      role: role || "student",
+      institution,
+      avatar: avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${name}`,
+      studyHistory: studyHistory || [],
+      isPremium: false,
     });
-  }
-});
-app.post("/api/register", async (req, res) => {
-  try {
-    const user = new User(req.body);
+
     await user.save();
     res.json(user);
   } catch (err) {
@@ -232,11 +239,9 @@ app.post("/api/login", async (req, res) => {
 });
 app.delete("/api/notes/:id", async (req, res) => {
   try {
-    console.log("Deleting ID:", req.params.id);
-
-    const deleted = await Note.findByIdAndDelete(req.params.id);
-
-    console.log("Deleted Note:", deleted);
+    const deleted = await Note.findOneAndDelete({
+      $or: [{ _id: req.params.id }, { id: req.params.id }],
+    });
 
     if (!deleted) {
       return res.status(404).json({ error: "Note not found" });
@@ -251,8 +256,8 @@ app.delete("/api/notes/:id", async (req, res) => {
 
 app.put("/api/notes/:id", async (req, res) => {
   try {
-    const updated = await Note.findByIdAndUpdate(
-      req.params.id,
+    const updated = await Note.findOneAndUpdate(
+      { $or: [{ _id: req.params.id }, { id: req.params.id }] },
       req.body,
       {
         new: true,

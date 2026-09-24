@@ -167,13 +167,14 @@ export default function App() {
 
   const handleDownload = async (note: Note) => {
     try {
-      const res = await fetch(`/api/notes/${note._id}/download`, { method: 'POST' });
+      const noteId = note._id || note.id;
+      const res = await fetch(`/api/notes/${noteId}/download`, { method: 'POST' });
       if (res.ok) {
         const result = await res.json();
-        if (selectedNote && selectedNote._id === note._id) {
+        if (selectedNote && (selectedNote._id || selectedNote.id) === noteId) {
           setSelectedNote(prev => prev ? { ...prev, downloads: result.downloads } : null);
         }
-        setNotes(prev => prev.map(n => n._id === note_id ? { ...n, downloads: result.downloads } : n));
+        setNotes(prev => prev.map(n => (n._id || n.id) === noteId ? { ...n, downloads: result.downloads } : n));
         
         const element = document.createElement("a");
         const file = new Blob([note.content], {type: 'text/plain'});
@@ -388,15 +389,12 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F9F8FF]/60 dark:bg-[#0B0A11]/75 text-[#2D2A3E] dark:text-[#E6E6FA] flex flex-col md:flex-row font-sans antialiased overflow-hidden h-screen relative" id="app-root">
-      
-      <div 
-        className="absolute inset-0 z-0 pointer-events-none bg-cover bg-center bg-no-repeat opacity-100 transition-all duration-500"
-        style={{ backgroundImage: `url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSQ4rrGXHHvCZB_2_GODAKhdiTEwlGqZtSxWwJEJzklcYNnz6y4Saiez4o&s=10')` }}
-      />
-      <div className="absolute inset-0 bg-slate-950/15 dark:bg-black/35 z-0 pointer-events-none" />
-      
-      <aside className="w-full md:w-64 bg-white/75 dark:bg-[#13121F]/75 backdrop-blur-2xl border-r border-[#E6E1FF]/50 dark:border-[#222033]/50 p-5 flex flex-col justify-between shrink-0 h-auto md:h-full z-10 shadow-[4px_0_24px_rgba(0,0,0,0.02)]" id="sidebar-container">
+    <div className="min-h-screen bg-[#f5f3ff] text-[#1f1b2d] flex flex-col md:flex-row font-sans antialiased overflow-hidden h-screen relative" id="app-root">
+      <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top_left,_rgba(139,92,246,0.18),_transparent_24%),radial-gradient(circle_at_bottom_right,_rgba(56,189,248,0.12),_transparent_30%)]" />
+      <div className="absolute left-16 top-20 -z-10 h-64 w-64 rounded-full bg-violet-300/20 blur-3xl" />
+      <div className="absolute bottom-12 right-12 -z-10 h-72 w-72 rounded-full bg-sky-300/15 blur-3xl" />
+
+      <aside className="w-full md:w-64 bg-white/80 backdrop-blur-2xl border-r border-violet-100 p-5 flex flex-col justify-between shrink-0 h-auto md:h-full z-10 shadow-[4px_0_24px_rgba(109,92,214,0.08)]" id="sidebar-container">
         <div>
           <div className="flex items-center gap-3 mb-8" id="logo-header">
             <div className="w-10 h-10 bg-gradient-to-br from-[#9D8DF1] to-[#7A6AD8] rounded-xl flex items-center justify-center text-white shadow-md shadow-violet-100 dark:shadow-none">
@@ -977,31 +975,84 @@ export default function App() {
             
             {activeTab === 'explore' && (
               <>
+                <div className="relative overflow-hidden rounded-[30px] border border-violet-200/80 bg-gradient-to-br from-[#5b3df2] via-[#4f46e5] to-[#0ea5e9] p-6 text-white shadow-[0_25px_90px_rgba(91,74,181,0.35)]">
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(255,255,255,0.30),_transparent_18%),radial-gradient(circle_at_bottom_left,_rgba(255,255,255,0.18),_transparent_25%)]" />
+                  <div className="absolute -right-10 top-0 h-56 w-56 rounded-full bg-white/10 blur-3xl" />
+                  <div className="relative z-10 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+                    <div className="max-w-xl">
+                      <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.22em] text-violet-100">
+                        <BookOpen className="h-3.5 w-3.5" />
+                        Study smarter, together
+                      </div>
+                      <h2 className="text-3xl font-black tracking-tight md:text-5xl">Discover your next breakthrough note.</h2>
+                      <p className="mt-4 max-w-lg text-sm leading-6 text-violet-100/90 md:text-base">
+                        Learn from verified academic resources, connect with peers, and keep every revision beautifully organized in one premium study ecosystem.
+                      </p>
+                    </div>
+
+                    <div className="grid min-w-[260px] grid-cols-3 gap-3">
+                      <div className="rounded-2xl border border-white/15 bg-white/10 p-3 backdrop-blur-sm">
+                        <p className="text-[10px] uppercase tracking-[0.18em] text-violet-100/75">Notes</p>
+                        <p className="mt-2 text-2xl font-black">{notes.length || 24}</p>
+                      </div>
+                      <div className="rounded-2xl border border-white/15 bg-white/10 p-3 backdrop-blur-sm">
+                        <p className="text-[10px] uppercase tracking-[0.18em] text-violet-100/75">Views</p>
+                        <p className="mt-2 text-2xl font-black">{totalViews || 892}</p>
+                      </div>
+                      <div className="rounded-2xl border border-white/15 bg-white/10 p-3 backdrop-blur-sm">
+                        <p className="text-[10px] uppercase tracking-[0.18em] text-violet-100/75">Rating</p>
+                        <p className="mt-2 text-2xl font-black">{averageRating || 4.8}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid gap-3 md:grid-cols-4">
+                  {[
+                    { label: 'AI summaries', value: 'Live', accent: 'violet', glow: 'from-violet-500/20 via-violet-400/10 to-transparent' },
+                    { label: 'Peer reviews', value: '1.2k', accent: 'sky', glow: 'from-sky-500/20 via-sky-400/10 to-transparent' },
+                    { label: 'Revision timeline', value: 'Instant', accent: 'emerald', glow: 'from-emerald-500/20 via-emerald-400/10 to-transparent' },
+                    { label: 'Premium wins', value: '80%', accent: 'amber', glow: 'from-amber-500/20 via-amber-400/10 to-transparent' }
+                  ].map((item) => (
+                    <div
+                      key={item.label}
+                      className="group relative overflow-hidden rounded-[22px] border border-violet-100 bg-white/80 p-4 shadow-[0_16px_38px_rgba(92,71,184,0.07)] backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_48px_rgba(92,71,184,0.12)]"
+                    >
+                      <div className={`absolute inset-0 bg-gradient-to-br ${item.glow}`} />
+                      <div className="relative z-10">
+                        <div className={`mb-3 h-2.5 w-14 rounded-full ${item.accent === 'violet' ? 'bg-violet-500' : item.accent === 'sky' ? 'bg-sky-500' : item.accent === 'emerald' ? 'bg-emerald-500' : 'bg-amber-500'}`} />
+                        <p className="text-[10px] font-black uppercase tracking-[0.18em] text-slate-400">{item.label}</p>
+                        <p className="mt-2 text-xl font-black text-slate-900">{item.value}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
                 <div className="shrink-0" id="study-carousel-container">
                   <StudyCarousel darkMode={darkMode} />
                 </div>
 
-                <div className="shrink-0 flex flex-col gap-3 bg-white/70 dark:bg-[#13121F]/70 backdrop-blur-md p-4 rounded-3xl border border-[#E6E1FF]/40 dark:border-[#222033]/40 shadow-xs animate-fadeIn" id="explore-filter-bar">
-                  <div className="flex justify-between items-center">
-                    <h3 className="text-sm font-black uppercase tracking-wider text-slate-900 dark:text-slate-100 flex items-center gap-2">
-                      <BookOpen className="w-4 h-4 text-[#9D8DF1]" />
-                      <span>Categorized subjects</span>
+                <div className="shrink-0 flex flex-col gap-3 bg-white/80 p-4 rounded-[26px] border border-violet-100 shadow-[0_16px_45px_rgba(76,55,163,0.06)] animate-fadeIn" id="explore-filter-bar">
+                  <div className="flex items-center justify-between gap-3">
+                    <h3 className="flex items-center gap-2 text-sm font-black uppercase tracking-[0.14em] text-slate-800">
+                      <BookOpen className="h-4 w-4 text-violet-600" />
+                      <span>Curated subjects</span>
                     </h3>
                     {selectedSubject !== 'All' && (
                       <button
                         onClick={() => setSelectedSubject('All')}
-                        className="text-xs text-[#9D8DF1] font-bold hover:underline cursor-pointer"
+                        className="text-xs font-bold text-violet-600 hover:text-violet-500"
                       >
                         Reset filters
                       </button>
                     )}
                   </div>
-                  <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-thin scrollbar-thumb-slate-200">
+                  <div className="flex items-center gap-2 overflow-x-auto pb-1">
                     {subjectsList.map((subj) => (
                       <button
                         key={subj}
                         onClick={() => setSelectedSubject(subj)}
-                        className={`px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${selectedSubject === subj ? 'bg-[#9D8DF1] text-white shadow-xs' : 'bg-white/75 dark:bg-[#1E1C30]/75 backdrop-blur-md border border-[#E6E1FF]/50 dark:border-[#2D2A45]/50 text-slate-900 dark:text-slate-100 font-extrabold hover:text-black dark:hover:text-white hover:bg-white/90 dark:hover:bg-[#1E1C30]/90'}`}
+                        className={`whitespace-nowrap rounded-xl px-3.5 py-2 text-xs font-semibold transition-all ${selectedSubject === subj ? 'bg-gradient-to-r from-violet-600 to-indigo-500 text-white shadow-[0_12px_25px_rgba(109,92,214,0.30)]' : 'border border-violet-100 bg-violet-50/40 text-slate-700 hover:border-violet-200 hover:bg-violet-100/60'}`}
                       >
                         {subj}
                       </button>
@@ -1010,12 +1061,14 @@ export default function App() {
                 </div>
 
                 <div className="flex-1 flex flex-col gap-3 min-h-[300px]" id="trending-notes-section">
-                  <div className="bg-white/70 dark:bg-[#13121F]/70 backdrop-blur-md px-5 py-4 rounded-3xl border border-[#E6E1FF]/40 dark:border-[#222033]/40 shadow-xs flex justify-between items-center animate-fadeIn">
-                    <h3 className="text-sm font-black text-slate-950 dark:text-white flex items-center gap-2">
-                      <TrendingUp className="w-4 h-4 text-[#9D8DF1]" />
-                      <span>{selectedSubject === 'All' ? 'Trending Notes Platform' : `${selectedSubject} Notes Hub`}</span>
+                  <div className="flex items-center justify-between rounded-[26px] border border-violet-100 bg-white/80 px-5 py-4 shadow-[0_10px_30px_rgba(76,55,163,0.04)] animate-fadeIn">
+                    <h3 className="flex items-center gap-2 text-sm font-black text-slate-900">
+                      <TrendingUp className="h-4 w-4 text-violet-600" />
+                      <span>{selectedSubject === 'All' ? 'Trending notes library' : `${selectedSubject} notes hub`}</span>
                     </h3>
-                    <span className="text-xs text-slate-900 dark:text-slate-100 font-extrabold bg-[#F3F0FF]/80 dark:bg-[#24223D]/80 px-3 py-1 rounded-full">{filteredNotes.length} matching resources found</span>
+                    <span className="rounded-full bg-violet-100 px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-violet-700">
+                      {filteredNotes.length} matches
+                    </span>
                   </div>
 
                   {filteredNotes.length === 0 ? (
@@ -1032,72 +1085,90 @@ export default function App() {
                           <div
                             key={note.id}
                             onClick={() => handleSelectNote(note)}
-                            className="bg-white/80 dark:bg-[#13121F]/80 backdrop-blur-md p-5 rounded-3xl border border-[#E6E1FF]/50 dark:border-[#222033]/50 hover:border-[#9D8DF1] dark:hover:border-[#9D8DF1] transition-all cursor-pointer shadow-[0_8px_30px_rgb(0,0,0,0.01)] hover:shadow-lg hover:scale-[1.01] flex flex-col justify-between group h-64 animate-fadeIn"
+                            className="group relative flex h-64 cursor-pointer flex-col justify-between overflow-hidden rounded-[28px] border border-violet-100 bg-white/80 p-5 shadow-[0_18px_46px_rgba(91,74,181,0.08)] backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:border-violet-300 hover:shadow-[0_26px_60px_rgba(91,74,181,0.15)] dark:border-[#25213b] dark:bg-[#13121f]/80"
                           >
-                            <div>
-                              <div className="flex justify-between items-start mb-3">
-                                <div className={`w-9 h-11 rounded-lg flex items-center justify-center font-bold ${note.isPremium ? 'bg-amber-50/80 text-amber-600 dark:bg-amber-950/30 dark:text-amber-400' : 'bg-[#F3F0FF]/80 text-[#9D8DF1] dark:bg-[#24223D]/80 dark:text-[#BDB2FF]'}`}>
-                                  {note.fileType === 'pdf' ? (
-                                    <FileText className="w-5 h-5 shrink-0" />
-                                  ) : (
-                                    <span className="text-xs">TXT</span>
-                                  )}
-                                </div>
+                            <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-violet-500 via-indigo-400 to-sky-400" />
+                            <div className="absolute -right-8 -top-8 h-24 w-24 rounded-full bg-gradient-to-br from-violet-200/50 to-sky-200/20 blur-2xl transition-all duration-300 group-hover:scale-110" />
 
-                                <button
-                            onClick={(e) => {
-    e.stopPropagation();
-    deleteNote(note._id);
-  }}
-  className="text-red-500 text-xs hover:text-red-700"
->
-  Delete
-</button>
-
-                                <div className="flex items-center gap-1.5">
-                                  {note.isPremium ? (
-                                    <span className="text-[9px] bg-amber-50/95 text-amber-700 border border-amber-200/50 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800/50 font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">Premium</span>
-                                  ) : (
-                                    <span className="text-[9px] bg-emerald-50/95 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">Free Access</span>
-                                  )}
-                                  
-                                  <button
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      toggleBookmark(note._id);
-                                    }}
-                                    className={`p-1.5 rounded-lg border transition cursor-pointer ${isStarred ? 'bg-[#F3F0FF] dark:bg-[#24223D] border-[#9D8DF1] text-[#9D8DF1]' : 'border-slate-100 dark:border-slate-800 text-slate-300 hover:text-[#9D8DF1]'}`}
-                                  >
-                                    <Star className="w-3.5 h-3.5 fill-current" />
-                                  </button>
-                                </div>
+                            <div className="relative z-10 flex items-start justify-between gap-3">
+                              <div className={`flex h-11 w-11 items-center justify-center rounded-2xl font-bold shadow-sm ${note.isPremium ? 'bg-gradient-to-br from-amber-100 to-amber-50 text-amber-600' : 'bg-gradient-to-br from-violet-100 to-indigo-50 text-violet-600'}`}>
+                                {note.fileType === 'pdf' ? (
+                                  <FileText className="h-5 w-5" />
+                                ) : (
+                                  <span className="text-[10px]">TXT</span>
+                                )}
                               </div>
 
-                              <h4 className="font-black text-sm mb-1 line-clamp-2 text-slate-950 dark:text-white group-hover:text-[#9D8DF1] transition-colors">{note.title}</h4>
-                              <p className="text-[10px] text-slate-700 dark:text-slate-300 font-bold mb-2 truncate">{note.institution}</p>
-                              <p className="text-[11px] text-slate-900 dark:text-slate-100 font-semibold line-clamp-2 mb-4 leading-relaxed">{note.description}</p>
+                              <div className="flex items-center gap-2">
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    deleteNote(note._id);
+                                  }}
+                                  className="rounded-full bg-red-50 px-2 py-1 text-[9px] font-bold text-red-500 transition hover:bg-red-100"
+                                >
+                                  Delete
+                                </button>
+
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    toggleBookmark(note._id);
+                                  }}
+                                  className={`rounded-xl border p-1.5 transition ${isStarred ? 'border-violet-200 bg-violet-50 text-violet-600' : 'border-slate-200 bg-white/60 text-slate-400 hover:text-violet-600'}`}
+                                >
+                                  <Star className="h-3.5 w-3.5 fill-current" />
+                                </button>
+                              </div>
                             </div>
 
-                            <div className="flex items-center justify-between border-t border-slate-200 dark:border-slate-800/70 pt-3 mt-auto text-xs font-bold text-slate-950 dark:text-slate-200">
-                              <div className="flex items-center gap-1.5 shrink-0">
+                            <div className="relative z-10 mt-4">
+                              <div className="mb-3 flex items-center justify-between gap-2">
+                                <span className="inline-flex rounded-full border border-violet-200 bg-violet-50 px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.18em] text-violet-700">
+                                  {note.subject}
+                                </span>
+                                {note.isPremium ? (
+                                  <span className="rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.14em] text-amber-700">
+                                    Premium
+                                  </span>
+                                ) : (
+                                  <span className="rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.14em] text-emerald-700">
+                                    Free
+                                  </span>
+                                )}
+                              </div>
+
+                              <h4 className="mb-2 line-clamp-2 text-base font-black leading-snug text-slate-900 transition-colors group-hover:text-violet-700 dark:text-white dark:group-hover:text-violet-300">
+                                {note.title}
+                              </h4>
+                              <p className="mb-2 truncate text-[10px] font-bold uppercase tracking-[0.14em] text-slate-500 dark:text-slate-300">
+                                {note.institution}
+                              </p>
+                              <p className="line-clamp-2 text-[11px] leading-relaxed text-slate-700 dark:text-slate-200">
+                                {note.description}
+                              </p>
+                            </div>
+
+                            <div className="relative z-10 mt-4 flex items-center justify-between border-t border-slate-200/80 pt-3 dark:border-slate-700/80">
+                              <div className="flex items-center gap-2">
                                 <img
                                   src={note.creatorAvatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${note.creatorName}`}
                                   alt={note.creatorName}
-                                  className="w-5 h-5 rounded-full bg-slate-200 dark:bg-slate-700"
+                                  className="h-7 w-7 rounded-full border border-violet-100 bg-slate-100 object-cover"
                                 />
-                                <span className="text-[10px] truncate max-w-[80px]">{note.creatorName}</span>
+                                <div className="min-w-0">
+                                  <p className="truncate text-[10px] font-black text-slate-800 dark:text-slate-100">{note.creatorName}</p>
+                                </div>
                               </div>
 
-                              <div className="flex items-center gap-3 font-bold">
-                                <div className="flex items-center text-amber-500 gap-0.5 text-[10px]">
-                                  <Star className="w-3 h-3 fill-amber-500" />
-                                  <span>{note.rating}</span>
-                                </div>
-                                {note.isPremium ? (
-                                  <span className="text-[#9D8DF1] font-extrabold">₹{Math.round(note.price || 0)}</span>
-                                ) : (
-                                  <span className="text-emerald-600 dark:text-emerald-400 font-extrabold text-[10px] uppercase">Free</span>
-                                )}
+                              <div className="flex items-center gap-2.5">
+                                <span className="flex items-center gap-1 text-[10px] font-bold text-amber-500">
+                                  <Star className="h-3 w-3 fill-amber-500" />
+                                  {note.rating}
+                                </span>
+                                <span className="text-[10px] font-black text-violet-700 dark:text-violet-300">
+                                  {note.isPremium ? `₹${Math.round(note.price || 0)}` : 'Free'}
+                                </span>
                               </div>
                             </div>
                           </div>

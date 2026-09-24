@@ -1,1 +1,58 @@
 @import "tailwindcss";
+
+:root {
+  color-scheme: light;
+  font-family: "Inter", "Segoe UI", sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top left, rgba(168, 85, 247, 0.18), transparent 28%),
+    radial-gradient(circle at bottom right, rgba(14, 165, 233, 0.14), transparent 30%),
+    #f5f3ff;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+@keyframes floatSoft {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes pulseGlow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 rgba(168, 85, 247, 0.15);
+  }
+  50% {
+    box-shadow: 0 0 24px rgba(168, 85, 247, 0.18);
+  }
+}
+
+.soft-float {
+  animation: floatSoft 7s ease-in-out infinite;
+}
+
+.hero-glow {
+  animation: pulseGlow 5s ease-in-out infinite;
+}
+
+.grid-pattern {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.12) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.12) 1px, transparent 1px);
+  background-size: 24px 24px;
+}

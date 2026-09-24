@@ -33,6 +33,14 @@ export default function UploadModal({ onClose, onUploadSuccess, creatorId, creat
   const fileInputRef = useRef<HTMLInputElement>(null);
   const qrInputRef = useRef<HTMLInputElement>(null);
 
+  const clearSelectedFile = () => {
+    setSelectedFileName('');
+    setSelectedFileSize('');
+    setNoteContent('');
+    setFileType('text');
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
   const subjects = [
     'Computer Science',
     'Medicine',
@@ -52,8 +60,13 @@ export default function UploadModal({ onClose, onUploadSuccess, creatorId, creat
 
   if (!file) return;
 
-  setSelectedFileName(file.name);
+  const normalizedName = file.name.trim();
+  setSelectedFileName(normalizedName);
   setSelectedFileSize(`${(file.size / 1024).toFixed(1)} KB`);
+
+  if (!title && normalizedName) {
+    setTitle(normalizedName.replace(/\.[^/.]+$/, '').replace(/[_-]+/g, ' '));
+  }
 
   if (file.name.endsWith(".txt")) {
     setFileType("text");
@@ -255,6 +268,47 @@ export default function UploadModal({ onClose, onUploadSuccess, creatorId, creat
 
             
 
+            <div className="rounded-2xl border border-dashed border-violet-200 bg-violet-50/50 p-4">
+              <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                <div>
+                  <p className="text-[10px] font-black uppercase tracking-[0.18em] text-violet-700">Upload notes file</p>
+                  <p className="mt-1 text-xs text-slate-500">Choose a .txt or .pdf file and the content will be imported automatically.</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept=".txt,.pdf"
+                    onChange={handleFileChange}
+                    className="hidden"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="inline-flex items-center gap-2 rounded-xl bg-violet-600 px-3.5 py-2 text-xs font-bold text-white shadow-sm hover:bg-violet-700 transition cursor-pointer"
+                  >
+                    <Upload className="h-3.5 w-3.5" />
+                    Choose File
+                  </button>
+                  {selectedFileName && (
+                    <button
+                      type="button"
+                      onClick={clearSelectedFile}
+                      className="text-[10px] font-bold text-red-500 hover:text-red-600 cursor-pointer"
+                    >
+                      Clear
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {selectedFileName && (
+                <div className="mt-3 rounded-xl border border-violet-200 bg-white px-3 py-2 text-xs text-slate-700">
+                  <span className="font-bold text-violet-700">Selected file:</span> {selectedFileName} <span className="text-slate-400">({selectedFileSize})</span>
+                </div>
+              )}
+            </div>
+
             <div>
               <div className="flex justify-between items-center mb-1">
                 <label htmlFor="note-content" className="block text-xs font-semibold uppercase tracking-wider text-slate-500">
@@ -265,7 +319,6 @@ export default function UploadModal({ onClose, onUploadSuccess, creatorId, creat
               <textarea
                 id="note-content"
                 rows={5}
-                required
                 value={noteContent}
                 onChange={(e) => setNoteContent(e.target.value)}
                 className="block w-full rounded-xl border border-slate-200 p-3 text-xs outline-none focus:border-violet-400 focus:ring-1 focus:ring-violet-400 transition font-mono bg-slate-50"
